@@ -1,0 +1,3 @@
+[submodule "estatico"]
+	path = estatico
+	url = https://github.com/TiagoTerra/estatico.git
