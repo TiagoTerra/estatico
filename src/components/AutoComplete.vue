@@ -1,56 +1,40 @@
-<template>
+<!-- <template>
   <div>
-    <input v-model="searchText" @input="search" class="form-control" />
-    <ul v-if="showOptions">
-      <li v-for="(option, index) in options" :key="index">{{ option }}</li>
-    </ul>
+    <autocomplete v-model="selectedItem" :get-suggestions="getSuggestions" @select="onSelect"
+      placeholder="Digite para pesquisar"></autocomplete>
   </div>
 </template>
 
 <script>
+import AutoComplete from 'vuejs-autocomplete';
+
 export default {
+  components: {
+    AutoComplete
+  },
   data() {
     return {
-      searchText: '',
-      options: [],
-      showOptions: false
+      selectedItem: null
     };
   },
-  mounted() {
-    // Carregar os dados do autocomplete uma vez quando o componente for montado
-    this.loadAutocompleteData();
-  },
   methods: {
-    loadAutocompleteData() {
-      // Chamar a API para carregar os dados do autocomplete
-      // Por exemplo:
-      // fetch('sua/api/autocomplete')
-      //   .then(response => response.json())
-      //   .then(data => {
-      //     this.options = data;
-      //   })
-      //   .catch(error => {
-      //     console.error('Erro ao carregar dados do autocomplete:', error);
-      //   });
+    async getSuggestions(query) {
+      // Faça uma chamada para a sua API para obter sugestões com base na consulta
+      // Aqui está um exemplo fictício usando a função fetch:
+      const response = await fetch(`https://api.example.com/search?q=${query}`);
+      const data = await response.json();
+      return data.results; // Supondo que sua API retorna um array de resultados
     },
-    search() {
-      // Verificar se o comprimento do texto de pesquisa é maior que 2
-      if (this.searchText.length >= 2) {
-        // Chamar a API para buscar os dados do autocomplete com base no texto de pesquisa
-        // Por exemplo:
-        fetch(`http://localhost:7071/api/GetEventoCategoria/3799/${this.searchText}`)
-          .then(response => response.json())
-          .then(data => {
-            this.options = data.map(objeto => objeto.nome);
-            this.showOptions = true; // Mostrar as opções depois de obter os resultados
-          })
-          .catch(error => {
-            console.error('Erro ao buscar dados do autocomplete:', error);
-          });
-      } else {
-        this.showOptions = false; // Esconder as opções se o texto de pesquisa for muito curto
-      }
+    onSelect(selectedItem) {
+      // Chamado quando um item é selecionado
+      // Aqui você pode fazer o que quiser com o item selecionado
+      this.selectedItem = selectedItem;
     }
   }
 };
-</script>
+</script> -->
+
+<!-- // Estilos opcionais para o componente autocomplete  -->
+<!-- <style> -->
+<!-- /*  */ -->
+<!-- </style> -->
