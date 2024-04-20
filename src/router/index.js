@@ -3,7 +3,7 @@ import { Buffer } from 'buffer';
 
 const routes = [
     {
-        path: "/",
+        path: "/helloworld",
         component: () => import('../components/HelloWorld.vue'),
     },
     {
