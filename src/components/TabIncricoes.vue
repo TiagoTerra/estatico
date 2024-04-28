@@ -1,12 +1,48 @@
 <template>
-  <div class="grid-container">
-    <div class="item-box" v-for="item in items" :key="item.id">
-      <h4>{{ item.ASS_Associado_Nome }}</h4>
-      <div>{{ item.EVE_EventoInscricaoAtleta_PontosRanking }}</div>
-      <div>{{ item.Clube }}</div>
-      <div>{{ item.EVE_EventoInscricaoAtleta_PontosRating }}</div>
-      <div>{{ item.Status_Inscricao }}</div>
-      <div>{{ item.Categoria_Nome }}</div>
+  <div class="container">
+    <div class="row">
+      <p>Estado: {{ classificaPorGrupo ? 'Agrupados por Clube' : 'Sem agrupamento' }}</p>
+      <div class="row">
+        <div class="col-md-2">
+          <label class="interruptor">
+            <input @click="alteraEstado" type="checkbox" v-model="classificaPorGrupo" class="interruptor-checkbox">
+            <span class="interruptor-slider"></span>
+          </label>
+        </div>
+        <div class="col-md-10"></div>
+      </div>
+
+      <div class="grid-container">
+
+        <div class="row">
+          <div v-show="!classificaPorGrupo" class="col-md-4" v-for="item in items" :key="item.id">
+            <div class="item-box">
+              <h5>{{ item.Clube }}</h5>
+              <div class="item-internal-box">
+                <h6>{{ item.ASS_Associado_Nome }}</h6>
+                <div>{{ item.EVE_EventoInscricaoAtleta_PontosRanking }}</div>
+                <div>{{ item.Clube }}</div>
+                <div>{{ item.EVE_EventoInscricaoAtleta_PontosRating }}</div>
+                <div>{{ item.Status_Inscricao }}</div>
+                <div>{{ item.Categoria_Nome }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div v-show="classificaPorGrupo" class="item-external-box" v-for="clube in items" :key="clube.Clube">
+          <h5>{{ clube.Clube }}</h5>
+          <div class="item-internal-box" v-for="item in clube.AtletasPorClube" :key="item.id">
+            <h6>{{ item.ASS_Associado_Nome }}</h6>
+            <hr />
+            <div>{{ item.EVE_EventoInscricaoAtleta_PontosRanking }}</div>
+            <div>{{ item.Clube }}</div>
+            <div>{{ item.EVE_EventoInscricaoAtleta_PontosRating }}</div>
+            <div>{{ item.Status_Inscricao }}</div>
+            <div>{{ item.Categoria_Nome }}</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -20,68 +56,60 @@ export default {
     msg: String
   },
   created() {
-    // this.$parent.$on('autocomplete-item-selected', this.onAutocompleteItemSelectedInTabs);
     window.addEventListener('autocompleteSelected', this.onAutocompleteSelected);
   },
   beforeUnmount() {
-    // Remove o ouvinte de evento ao destruir o componente
     window.removeEventListener('autocompleteSelected', this.onAutocompleteSelected);
   },
   unmonted() {
   },
   data() {
     return {
-      items: null
+      items: null,
+      classificaPorGrupo: true,
+      itemSelecionado: null
+    }
+  },
+  watch: {
+    interruptor(novoValor) {
+      console.log("Estado atual do interruptor:", novoValor ? "Agrupados por Clube" : "Sem agrupamento");
     }
   },
   mounted() {
-    // this.loadAtletaEvento('88888888')
-    // alert('mounted');
+    this.carregarTab(this.msg);
   },
   setup() {
-    // const onAutocompleteSelected = (event) => {
-    //   alert('1.1');
-    //   const selectedItem = event.detail.selectedItem;
-    //   alert(selectedItem);
-
-    //   // carregarTab(selectedItem);
-    // };
-
-    // alert('só setup');
-
-    // const carregarTab = (selectedItem) => {
-    //   console.log('Item selecionado:', selectedItem);
-    //   // Implemente a lógica para carregar a tab com base no item selecionado
-    // };
-    // const onAutocompleteSelected = (event) => {
-    //   // Obtém os detalhes do evento para obter o item selecionado
-    //   const selectedItem = event.detail.selectedItem;
-    //   alert(selectedItem);
-    //   alert('selecionou');
-    //   // Carrega a tab com base no item selecionado
-    //   // this.carregarTab(selectedItem);
-    // }
-
     const tabRef = ref(null);
 
     onMounted(() => {
-      // window.addEventListener('autocomplete-selected', onAutocompleteSelected);
-    });
 
+    });
     onBeforeUnmount(() => {
-      // window.removeEventListener('autocomplete-selected', onAutocompleteSelected);
     });
     return {
       tabRef
     };
   },
-  // mounted:() {
-  //   this.loadAtletaEvento();
-  // },
   methods: {
-    carregarTab(selectedItem) {
-      // const response = fetch('http://localhost:7071/api/GetAtletaEvento/3663/' + selectedItem.eventoId);
-      fetch('http://localhost:7071/api/GetAtletaEvento/3663/' + selectedItem)
+    carregarTab(categoryId) {
+      this.itemSelecionado = categoryId;
+      if (this.itemSelecionado != undefined && this.itemSelecionado != null)
+        this.carregarDados();
+    },
+    handleAutocompleteSelected(selectedItem) {
+      var item = selectedItem;
+      console.log('Item selecionado:', item);
+      this.carregarTab(item.categoryId);
+    },
+    alteraEstado() {
+      this.classificaPorGrupo = !this.classificaPorGrupo;
+      this.carregarDados();
+    },
+    carregarDados() {
+      const rota = this.classificaPorGrupo ? 'http://localhost:7071/api/GetAtletaEvento/3663/' + this.itemSelecionado + "/c/" + 'clube'
+        : 'http://localhost:7071/api/GetAtletaEvento/3663/' + this.itemSelecionado;
+
+      fetch(rota)
         .then(response => {
           if (!response.ok) {
             throw new Error('Erro na requisição');
@@ -96,24 +124,7 @@ export default {
         .catch(error => {
           console.error('Erro:', error);
         });
-
-
-      // this.items = response.json();
-      // console.log('Item selecionado:', selectedItem);
-    },
-    handleAutocompleteSelected(selectedItem) {
-      var item = selectedItem;
-      console.log('Item selecionado:', item);
-      this.carregarTab(item.categoryId);
     }
-    // async loadAtletaEvento(eventoId) {
-    //   const response = await fetch('http://localhost:7071/api/GetAtletaEvento/3663/' + eventoId);
-    //   this.items = await response.json();
-    // },
-    // onAutocompleteItemSelectedInTabs(eventoId) {
-    //   alert('z')
-    //   this.loadAtletaEvento(eventoId);
-    // }
   }
 }
 </script>
@@ -139,9 +150,38 @@ a {
 }
 
 .grid-container {
-  display: flex;
+  /* display: flex;
   flex-wrap: wrap;
-  justify-content: flex-start;
+  justify-content: flex-start; */
+}
+
+.item-internal-box {
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  padding: 5px;
+  /* margin-bottom: 20px; */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s;
+  font-size: 12px;
+  width: 90%;
+  margin-left: 1%;
+  margin-bottom: 1%;
+  margin: 5px 0 0 !important;
+}
+
+
+.item-external-box {
+  background-color: #f0f0f0;
+  border-radius: 10px;
+  padding: 20px;
+  /* margin-bottom: 20px; */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: transform 0.3s;
+  font-size: 12px;
+  width: calc(24%);
+  margin-left: 3%;
+  margin-bottom: 1%;
+  margin: 1px 0 0 !important;
 }
 
 .item-box {
@@ -152,7 +192,8 @@ a {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
   transition: transform 0.3s;
   font-size: 12px;
-  width: calc(24% - 20px);
+  width: 100%;
+  /* width: 100%; calc(24% - 20px); */
   margin-left: 1%;
   margin-bottom: 1%;
 }
@@ -162,5 +203,52 @@ a {
   font-size: 12px;
   transform: translateY(-5px);
   box-shadow: 0 6px 12px #4caf50, 0 3px 6px yellow;
+}
+
+.interruptor {
+  position: relative;
+  display: inline-block;
+  width: 60px;
+  height: 34px;
+}
+
+.interruptor-checkbox {
+  display: none;
+}
+
+.interruptor-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 34px;
+}
+
+.interruptor-slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 4px;
+  bottom: 4px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+  border-radius: 50%;
+}
+
+.interruptor-checkbox:checked+.interruptor-slider {
+  background-color: #4caf50;
+}
+
+.interruptor-checkbox:checked+.interruptor-slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(26px);
 }
 </style>
