@@ -27,7 +27,7 @@
         <div class="tab-content">
           <!-- Renderiza o componente correspondente à tab ativa -->
           <Tab1 ref="tabComponent" v-if="activeTab === 0" :msg="categoriaId" />
-          <Tab2 v-if="activeTab === 1" />
+          <Tab2 ref="tabGrupos" v-if="activeTab === 1" :msg="categoriaId" />
           <Tab3 ref="tabResultados" v-if="activeTab === 2" :msg="categoriaId" />
           <Tab4 v-if="activeTab === 3" />
         </div>
@@ -37,14 +37,11 @@
 </template>
 
 <script>
-// import VueAutocomplete from 'vue3-autocomplete';
-
 import { ref } from 'vue';
 import Tab1 from './components/TabIncricoes.vue';
 import Tab2 from './components/TabGrupos.vue';
 import Tab3 from './components/TabResultados.vue';
 import Tab4 from './components/TabFaseEliminatoria.vue';
-// import { Alert } from 'bootstrap';
 
 export default {
   name: 'TabsComponent',
@@ -111,6 +108,9 @@ export default {
       if (index == 0) {
         this.$refs.tabComponent?.handleAutocompleteSelected(this.itemSelecionado);
       }
+      else if (index == 1) {
+        this.$refs.tabGrupos?.handleAutocompleteSelected(this.itemSelecionado, '3799');
+      }
       else if (index == 2) {
         this.$refs.tabResultados?.handleAutocompleteSelected(this.itemSelecionado, '3799');
       }
@@ -154,10 +154,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-    submitForm() {
-      // Lógica para lidar com o envio do formulário
-      console.log('Formulário enviado!');
     },
   }
 };

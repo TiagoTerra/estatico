@@ -111,17 +111,8 @@ export default {
   },
   methods: {
     carregaResultados() {
-      /// Paramos aqui: preciamos checar como está a passagem de parametros, precisamos receber o eventoId e a categoria pelo menos
-      /// Com isso, vamos poder carregar os dados e iniciar a confecção do layout
-      ///  { 04:00 }
-      /// APós confecção do layout realizada com sucesso, vamos colocar dois filtros a mais nessa consulta, referenre a combos 
-      //// { 01:00 }
-      /// Feito isso, iremos realizar o teste de troca de abas, e ajustar para persistir estado do componente, se for o caso de
-      /// necessitar de ajuste 
-      ///  { 01:00 }
       if (this.msg != undefined && this.msg != null) {
-        const rota = this.classificaPorGrupo ? 'http://localhost:7071/api/GetJogoEventoApp/3663/' + this.msg + "/c/" + 'clube'
-          : 'http://localhost:7071/api/GetJogoEventoApp/3663/' + this.msg;
+        const rota = 'http://localhost:7071/api/GetJogoEventoApp/3663/' + this.msg;
 
         fetch(rota)
           .then(response => {
